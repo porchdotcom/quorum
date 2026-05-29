@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { redis } from "@/lib/redis";
+import { getRedis } from "@/lib/redis";
 import { Poll, PollMode, Question } from "@/lib/types";
 import { nanoid } from "nanoid";
 
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
     createdAt: new Date().toISOString(),
   };
 
+  const redis = await getRedis();
   await redis.set(`poll:${poll.id}`, JSON.stringify(poll));
 
   return NextResponse.json({ id: poll.id });

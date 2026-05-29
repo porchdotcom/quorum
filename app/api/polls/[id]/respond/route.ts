@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { redis } from "@/lib/redis";
+import { getRedis } from "@/lib/redis";
 import { Poll, Response } from "@/lib/types";
 import { nanoid } from "nanoid";
 
@@ -8,10 +8,11 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
+  const redis = await getRedis();
   const raw = await redis.get(`poll:${id}`);
   if (!raw) return NextResponse.json({ error: "poll not found" }, { status: 404 });
 
-  const poll: Poll = typeof raw === "string" ? JSON.parse(raw) : (raw as Poll);
+  const poll: Poll = JSON.parse(raw);
 
   const body = await req.json();
   const response: Response = {
